@@ -1,0 +1,203 @@
+body {
+  padding: 8px 0 16px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: #efefef;
+  margin: 0;
+}
+
+a {
+  color: #00B7FF;
+}
+#upload-box{
+  width: 400px;
+  max-width: 90%;
+  box-sizing: border-box;
+  margin: 20px auto 20px;
+  padding: 24px 12px;
+  border: 2px dashed rgba(0,0,0,0.4);
+  border-radius: 8px;
+  cursor: pointer;
+}
+#upload-box:hover{
+  border-color: rgba(0,0,0,0.2);
+}
+.option-box{
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  width: 800px;
+  margin: 16px auto;
+  max-width: 90%;
+  overflow-x: auto;
+}
+span.label{
+  font-size: 14px;
+  color: #333;
+  margin-right: 2px;
+}
+input + .label{
+  margin-left: 26px;
+}
+.option-row{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 12px 0;
+  padding: 0 110px;
+}
+.option-row.gif{
+  padding-left: 147px;
+}
+.option-row.gif .label {
+  margin-right: 4px;
+  font-size: 12px;
+}
+input[type="number"]{
+  width: 100px;
+  padding: 4px;
+}
+select{
+  padding: 4px;
+  width: 112px;
+}
+input[type="range"] {
+  width: 112px;
+}
+#quality-value{
+  margin-right: 30px;
+  margin-left: 3px;
+}
+select#format{
+  margin-right: 26px;
+}
+.note{
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  width: 800px;
+  margin: 16px auto;
+  text-align: center;
+  max-width: 90%;
+  overflow-x: auto;
+}
+.dragover{
+  border-color: forestgreen!important;
+}
+#file-list{
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  width: 800px;
+  margin: 0 auto;
+  max-width: 100%;
+  overflow-x: auto;
+}
+#file-list.hidden{
+  display: none;
+}
+.file-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  margin: 4px;
+  background: #efefef;
+  border-radius: 4px;
+}
+.file-item span{
+  margin: 0 12px;
+  display: inline-block;
+  width: 60px;
+}
+.download-button{
+  color: dodgerblue;
+  cursor: pointer;
+}
+.download-button:hover{
+  color: royalblue;
+}
+.download-button:disabled{
+  color: #999;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.file-progress{
+  width: 200px;
+  height: 8px;
+  border-radius: 4px;
+  background: #efefef;
+  position: relative;
+}
+.file-progress .file-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 4px;
+  background-image: linear-gradient(to right, rgb(16, 142, 233), rgb(135, 208, 104))
+}
+.file-status{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+}
+.file-status-text{
+  font-size: 12px;
+}
+.file-item span.file-name{
+  width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: dodgerblue;
+  cursor: pointer;
+}
+.file-item span.file-name:hover{
+  color: royalblue;
+}
+.file-item span.file-name.disable{
+  color: #000;
+  cursor: default;
+}
+.file-item.hidden{
+  display: none;
+}
+.file-item .file-size, .file-item .compressed-size{
+  width: 100px;
+}
+.success-icon{
+  color: #52c41a;
+}
+.download-all-wrap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+.download-all-wrap .download-all{
+  background-color: dodgerblue;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.download-all-wrap .download-all:hover{
+  opacity: 0.8;
+}
+.download-all-wrap.hidden {
+  display: none;
+}
+@media screen and (max-width: 800px) {
+  .option-row{
+    min-width: 530px;
+    padding: 0 8px;
+  }
+  .option-row.gif{
+    padding-left: 47px;
+  }
+  .file-item{
+    min-width: 700px;
+  }
+}
