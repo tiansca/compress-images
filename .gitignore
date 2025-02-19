@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 tests/**/coverage/
+public/images
+public/zip
+myDataBase.json
 
 # Editor directories and files
 .idea
