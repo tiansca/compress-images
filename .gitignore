@@ -17,3 +17,4 @@ myDataBase.json
 *.ntvs*
 *.njsproj
 *.sln
+/compress-images.tar

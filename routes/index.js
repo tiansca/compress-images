@@ -88,12 +88,14 @@ router.get('/deleteOldTask', async function (req, res, next) {
   }
   const keys = Object.keys(taskList)
   // 删除一天前的数据
+  let count = 0
   for (const key of keys) {
     const item = taskList[key];
     const createTime = item.dateTime
     const diff = Date.now() - createTime
     const day = diff / (24 * 60 * 60 * 1000)
     if (day > 1) {
+      count++
       // 删除旧的任务
       const imageDir = path.join(__dirname, '../', `${imagePath}/${key})`)
       const zipDir = path.join(__dirname, '../', `${zipPath}/${key}.zip)`)
@@ -115,9 +117,16 @@ router.get('/deleteOldTask', async function (req, res, next) {
       }
     }
   }
+  if (count === 0) {
+    res.send({
+      code: -1,
+      data: '没有过期的任务'
+    })
+    return
+  }
   res.send({
     code: 0,
-    data: '删除成功'
+    data: `成功删除${count}条记录`
   })
 })
 module.exports = router;

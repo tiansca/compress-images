@@ -199,5 +199,9 @@ select#format{
   }
   .file-item{
     min-width: 700px;
+    padding: 8px 0;
+  }
+  #file-list{
+    max-width: 90%;
   }
 }
