@@ -34,9 +34,9 @@ document.querySelector('#height').addEventListener('input', function (e) {
 document.querySelector('#rotate').addEventListener('input', function (e) {
   args.rotate = e.target.value
 })
-document.querySelector('#colors').addEventListener('input', function (e) {
-  args.colors = e.target.value
-})
+// document.querySelector('#colors').addEventListener('input', function (e) {
+//   args.colors = e.target.value
+// })
 document.querySelector('#colours').addEventListener('input', function (e) {
   args.colours = e.target.value
 })
@@ -299,13 +299,22 @@ function updateListItem(dom, itemData) {
   }
 }
 
-function downloadFile(url) {
-  const a = document.createElement('a')
-  a.href = url
-  // 解析文件名称，兼容中文，去除多余路径，windows路径以“\\”分隔，linux路径以“/”分隔
-  a.download = url.split('\\').pop().split('/').pop()
-  console.log(a.download)
-  a.click()
+function downloadFile(url, name) {
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(url, name)
+  } else {
+    const a = document.createElement('a')
+    a.href = url
+    // 去掉url中?及?后的参数
+    url= url.split('?')[0]
+    if (!name) {
+      name = url.split('\\').pop().split('/').pop()
+    }
+    // 解析文件名称，兼容中文，去除多余路径，windows路径以“\\”分隔，linux路径以“/”分隔
+    a.download = name
+    console.log(a.download)
+    a.click()
+  }
 }
 
 // 下载所有

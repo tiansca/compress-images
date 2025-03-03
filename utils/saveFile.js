@@ -116,7 +116,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
             status: 'success',
             size: size,
             compressedSize: fileSize.size,
-            url: targetImagePath.split('public')[1]
+            url: targetImagePath.split('public')[1] + '?' + Date.now() // 防止缓存
           }, index)
         } catch (e) {
           console.error(e)

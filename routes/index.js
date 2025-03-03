@@ -8,6 +8,7 @@ const {zipPath, imagePath} = require("../config/path");
 const path = require("path");
 const packDir = require("../utils/pack");
 const rmdirPromise = require("../utils/delete");
+const saveFileSingle = require("../utils/saveFileSingle");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -127,6 +128,54 @@ router.get('/deleteOldTask', async function (req, res, next) {
   res.send({
     code: 0,
     data: `成功删除${count}条记录`
+  })
+})
+
+// 单张图片压缩，压缩后下载
+router.post('/compress', async function (req, res, next) {
+  const filesList = []
+  const form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.on('file', function (filed, file) {
+    // console.log(filed)
+    filesList.push(file);
+  });
+  form.parse(req, async function (err, filed) {
+    console.log(filed)
+    if (!err) {
+      if (filesList && filesList.length) {
+        // 遍历文件，复制到public/images目录下
+        if (filesList.length > 1) {
+          res.send({
+            code: -1,
+            data: '请上传单张图片'
+          })
+          return
+        }
+        const id = uuidv4();
+        const result = await saveFileSingle(id, filesList[0], filed)
+        if (filed.responseType === 'json') {
+          res.send({
+            code: 0,
+            data: result
+          })
+        } else {
+          let url = result.url
+          url = url.split('?')[0]
+          // 从url中解析文件名称
+          const fileName = url.split('\\').pop().split('/').pop()
+          res.set('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
+          res.sendFile(path.join(__dirname, '../public', url))
+        }
+      } else {
+        res.send({
+          code: -1,
+          data: '没有文件'
+        })
+      }
+    } else {
+      console.log(err)
+    }
   })
 })
 module.exports = router;

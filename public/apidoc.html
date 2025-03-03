@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta charset="UTF-8">
+  <title>图片压缩接口文档</title>
+  <link rel="icon" href="/favicon.png"></link>
+  <link rel="stylesheet" href="stylesheets/style.css">
+  <meta name="keys" content="图片压缩,图片格式转换,图片尺寸修改,在线压缩">
+  <meta name="description" content="图片压缩，格式转换，尺寸修改"></meta>
+  <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px }
+      h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px }
+      table { width: 100%; border-collapse: collapse; margin: 20px 0 }
+      th, td { border: 1px solid #ddd; padding: 12px; text-align: left }
+      th { background-color: #f8f9fa }
+      code { background-color: #f3f3f3; padding: 2px 5px; border-radius: 3px }
+  </style>
+</head>
+<body>
+<h2>文件压缩接口</h2>
+
+<h3>接口描述</h3>
+<p>本接口用于上传单张图片并进行压缩处理，支持质量调整、尺寸修改、格式转换等操作，返回压缩后的文件URL或文件流。</p>
+
+<h3>请求信息</h3>
+<table>
+  <tr><th>URL</th><td>/compress</td></tr>
+  <tr><th>方法</th><td>POST</td></tr>
+  <tr><th>Content-Type</th><td>multipart/form-data</td></tr>
+</table>
+
+<h3>请求参数</h3>
+<table>
+  <tr><th>参数名</th><th>类型</th><th>必填</th><th>默认值</th><th>描述</th></tr>
+  <tr><td>file</td><td>File</td><td>是</td><td>-</td><td>要压缩的文件（通过表单上传）</td></tr>
+  <tr><td>quality</td><td>Number</td><td>否</td><td>75</td><td>压缩质量（0-100）</td></tr>
+  <tr><td>format</td><td>String</td><td>否</td><td>空</td><td>目标格式（如：png/jpeg）</td></tr>
+  <tr><td>width</td><td>Number</td><td>否</td><td>空</td><td>目标宽度（像素）</td></tr>
+  <tr><td>height</td><td>Number</td><td>否</td><td>空</td><td>目标高度（像素）</td></tr>
+  <tr><td>rotate</td><td>Number</td><td>否</td><td>空</td><td>旋转角度（0-360）</td></tr>
+  <tr><td>colors</td><td>Number</td><td>否</td><td>256</td><td>颜色数量限制</td></tr>
+  <tr><td>responseType</td><td>String</td><td>否</td><td>blob</td><td>返回类型：json返回URL，其他值返回文件流</td></tr>
+</table>
+
+<h3>响应参数（当responseType=json时）</h3>
+<table>
+  <tr><th>参数名</th><th>类型</th><th>描述</th></tr>
+  <tr><td>code</td><td>Number</td><td>状态码（0表示成功）</td></tr>
+  <tr><td>message</td><td>String</td><td>状态描述</td></tr>
+  <tr><td>data.url</td><td>String</td><td>压缩后的文件访问地址</td></tr>
+</table>
+
+<h3>请求示例</h3>
+<pre><code>
+const form = new FormData();
+form.append('file', fileInput.files[0]);
+form.append('quality', 80);
+form.append('width', 800);
+form.append('responseType', 'json');
+const xhr = new XMLHttpRequest();
+xhr.open('POST', '/compress', true);
+
+// 监听上传进度
+xhr.upload.onprogress = (event) => {
+  if (event.lengthComputable) {
+    const percent = (event.loaded / event.total) * 100;
+    console.log(`上传进度: ${Math.floor(percent)}%`);
+  }
+};
+
+xhr.onload = () => {
+  if (form.get('responseType') === 'json') {
+    const res = JSON.parse(xhr.response)
+    if (res.code === 0 ) {
+      downloadFile(res.data.url)
+    }
+  } else {
+    let fileName = ''
+    // 获取文件名
+    const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+    if (contentDisposition) {
+      const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+      if (fileNameMatch && fileNameMatch[1]) {
+        fileName = decodeURIComponent(fileNameMatch[1]);
+      }
+    }
+    // 下载blob文件
+    const blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    downloadFile(url, fileName)
+  }
+};
+xhr.send(form);
+
+// 下载文件
+function downloadFile(url, name) {
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(url, name)
+  } else {
+    const a = document.createElement('a')
+    a.href = url
+    // 去掉url中?及?后的参数
+    url= url.split('?')[0]
+    if (!name) {
+      name = url.split('\\').pop().split('/').pop()
+    }
+    // 解析文件名称，兼容中文，去除多余路径，windows路径以“\\”分隔，linux路径以“/”分隔
+    a.download = name
+    console.log(a.download)
+    a.click()
+  }
+}
+</code></pre>
+
+<h3>响应示例</h3>
+<pre><code>
+{
+    "code": 0,
+    "message": "success",
+    "data": {
+        "url": "/compressed/file_123.jpg"
+    }
+}
+</code></pre>
+
+<h3>注意事项</h3>
+<ul>
+  <li>当width/height设为空时表示保持原尺寸比例</li>
+  <li>responseType默认为"blob"，当设置为"json"时返回压缩后的文件访问地址</li>
+  <li>支持的输入文件类型包括图片格式（JPEG, PNG, WebP, GIF, AVIF, TIFF, BMP, 和 SVG）</li>
+</ul>
+</body>
+</html>
