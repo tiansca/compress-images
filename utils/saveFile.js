@@ -118,8 +118,18 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
             compressedSize: fileSize.size,
             url: targetImagePath.split('public')[1] + '?' + Date.now() // 防止缓存
           }, index)
+          // 删除源文件
+          fs.unlink(inputImagePath, (err) => {
+            if (err) {
+              console.error('Error deleting file:', err);
+            } else {
+              console.log('File deleted successfully.');
+            }
+          })
+          sharpObj = null
         } catch (e) {
           console.error(e)
+          sharpObj = null
         }
       }
     });

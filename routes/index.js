@@ -18,7 +18,7 @@ router.get('/', function(req, res, next) {
 
 // 上传图片列表
 router.post('/upload', async function (req, res, next) {
-  const filesList = []
+  let filesList = []
   const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.on('file', function (filed, file) {
@@ -36,6 +36,7 @@ router.post('/upload', async function (req, res, next) {
           code: 0,
           data: result
         })
+        filesList = null
       } else {
         res.send({
           code: -1,
