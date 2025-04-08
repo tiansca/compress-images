@@ -1,6 +1,6 @@
 const { JsonDB, Config } = require('node-json-db');
 const { Mutex } = require('async-mutex');
-const db = new JsonDB(new Config("myDataBase", true, false, '/'));
+const db = new JsonDB(new Config("myDataBase", false, false, '/'));
 const mutex = new Mutex();
 console.log('实例化json db')
 
@@ -24,8 +24,12 @@ const JSONDB = {
         }
       }
       await db.push(`/${taskId}/list`, taskList)
+      try {
+        await db.save()
+      } catch (e) {
+        console.log('db.save() error', e)
+      }
       release(); // 释放锁
-      await db.reload()
       return
     }
     // 没有就创建
@@ -36,12 +40,16 @@ const JSONDB = {
       console.log('db.save() error', e)
     }
     release(); // 释放锁
-    await db.reload()
   },
   setTaskStatus: async (taskId, item) => {
     const list = await JSONDB.getTaskList(taskId);
     const index = list.findIndex(file => file.name === item.name)
     await db.push(`/${taskId}/list[${index}]`, item);
+    try {
+      await db.save()
+    } catch (e) {
+      console.log('db.save() error', e)
+    }
   },
   getTaskList: async (taskId) => {
     try {
@@ -55,6 +63,11 @@ const JSONDB = {
   },
   deleteTask: async (taskId) => {
     await db.delete(`/${taskId}`);
+    try {
+      await db.reload()
+    } catch (e) {
+      console.log('db.reload() error', e)
+    }
   },
 }
 module.exports = JSONDB
