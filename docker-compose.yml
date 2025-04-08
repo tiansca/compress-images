@@ -1,0 +1,19 @@
+version: '3'
+services:
+  backend:
+    image: compress-images:latest
+    networks:
+      - mynetwork
+    volumes:
+      - ./public/images:/app/public/images
+    restart: always
+    ports:
+      - "3009:3009"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 400m
+networks:
+  mynetwork:
+    driver: bridge

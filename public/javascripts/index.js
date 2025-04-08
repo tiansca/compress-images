@@ -151,7 +151,7 @@ async function uploadFiles(files) {
   if (getListTimer) {
     clearInterval(getListTimer)
   }
-  getListTimer = setInterval(getTaskList, 1000)
+  getListTimer = setInterval(getTaskList, 3000)
 }
 
 function uploadFile(formData) {
