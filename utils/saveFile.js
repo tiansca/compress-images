@@ -5,6 +5,8 @@ const JSONDB = require('./jsonDb')
 const sharp = require('sharp')
 const pLimit = require('p-limit');
 const limit = pLimit(4); // 限制并发数为4
+
+sharp.cache(false); // 禁用缓存，以避免内存占用过高
 /*
 * taskId: 任务id
 * files: 文件列表
@@ -61,6 +63,8 @@ const saveFile = async (taskId, files, option) => {
     throw new Error(`文件处理失败: ${err.message}`)
   } finally {
     files = null // 帮助垃圾回收
+    // 内存释放
+    global.gc();
   }
 }
 const compressImage = async (inputImagePath, targetImagePath, option, fileName, taskId, index, size) => {
