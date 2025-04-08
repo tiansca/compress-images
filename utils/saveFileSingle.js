@@ -97,6 +97,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
       .toFile(targetImagePath, async (err, info) => {
         if (err) {
           console.error('Error compressing image:', err);
+          sharpObj = null
         } else {
           console.log('Image compressed successfully:', info);
           // 获取压缩后的文件大小
@@ -115,6 +116,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
             console.error(e)
             reject(e)
           }
+          sharpObj = null
         }
       });
   })

@@ -27,14 +27,16 @@ const saveFile = (taskId, files, option) => {
     } catch (e) {
       reject(e)
     }
-    files.forEach((file, index) => {
+    for (const file of files) {
+      const index = files.indexOf(file);
       const {filepath, originalFilename} = file
       // 获取扩展名
       const fileName = `${originalFilename}`
       const targetPath = path.join(__dirname, '../', `${imagePath}/${taskId}`, fileName)
       // console.log(targetPath, 'targetPath')
-      compressImage(filepath, targetPath, option, fileName, taskId, index, file.size)
-    })
+      await compressImage(filepath, targetPath, option, fileName, taskId, index, file.size)
+    }
+    files = null
   })
 }
 const compressImage = async (inputImagePath, targetImagePath, option, fileName, taskId, index, size) => {
@@ -106,6 +108,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
     .toFile(targetImagePath, async (err, info) => {
       if (err) {
         console.error('Error compressing image:', err);
+        sharpObj = null
       } else {
         console.log('Image compressed successfully:', info);
         // 获取压缩后的文件大小
@@ -118,19 +121,10 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
             compressedSize: fileSize.size,
             url: targetImagePath.split('public')[1] + '?' + Date.now() // 防止缓存
           }, index)
-          // 删除源文件
-          fs.unlink(inputImagePath, (err) => {
-            if (err) {
-              console.error('Error deleting file:', err);
-            } else {
-              console.log('File deleted successfully.');
-            }
-          })
-          sharpObj = null
         } catch (e) {
           console.error(e)
-          sharpObj = null
         }
+        sharpObj = null
       }
     });
 }
