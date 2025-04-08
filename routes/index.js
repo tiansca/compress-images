@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
 // 上传图片列表
 router.post('/upload', async function (req, res, next) {
   let filesList = []
-  const form = new formidable.IncomingForm();
+  let form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.on('file', function (filed, file) {
     // console.log(filed)
@@ -37,6 +37,7 @@ router.post('/upload', async function (req, res, next) {
           data: result
         })
         filesList = null
+        form = null
       } else {
         res.send({
           code: -1,
@@ -134,8 +135,8 @@ router.get('/deleteOldTask', async function (req, res, next) {
 
 // 单张图片压缩，压缩后下载
 router.post('/compress', async function (req, res, next) {
-  const filesList = []
-  const form = new formidable.IncomingForm();
+  let filesList = []
+  let form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.on('file', function (filed, file) {
     // console.log(filed)
@@ -177,6 +178,8 @@ router.post('/compress', async function (req, res, next) {
     } else {
       console.log(err)
     }
+    form = null
+    filesList = null
   })
 })
 module.exports = router;

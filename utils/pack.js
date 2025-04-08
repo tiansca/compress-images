@@ -12,11 +12,15 @@ function packDir(input, outputPath) {
       fs.unlinkSync(outputPath);
     }
     // 创建输出流（可替换为HTTP响应流）
-    const output = fs.createWriteStream(outputPath);
-    const archive = archiver('zip', { zlib: { level: 9 } }); // 最高压缩级别
+    let output = fs.createWriteStream(outputPath);
+    let archive = archiver('zip', { zlib: { level: 9 } }); // 最高压缩级别
 
     // 绑定管道和事件监听
-    output.on('close',  () => resolve(outputPath));
+    output.on('close',  () => {
+      resolve(outputPath)
+      output = null
+      archive = null
+    });
     archive.on('error',  (err) => { reject(err) });
 
     archive.pipe(output);
