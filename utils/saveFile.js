@@ -4,9 +4,11 @@ const path = require('path')
 const JSONDB = require('./jsonDb')
 const sharp = require('sharp')
 const pLimit = require('p-limit');
-const limit = pLimit(4); // 限制并发数为4
+const limit = pLimit(2); // 限制并发数
 
-sharp.cache(false); // 禁用缓存，以避免内存占用过高
+// sharp.cache(false); // 禁用缓存，以避免内存占用过高
+sharp.simd(false); // 禁用SIMD
+sharp.cache({ memory: 0, files: 0 });
 /*
 * taskId: 任务id
 * files: 文件列表
@@ -78,8 +80,8 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
 
     // 初始化 sharp
     sharpObj = format === 'gif'
-      ? sharp(inputImagePath, { animated: true })
-      : sharp(inputImagePath);
+      ? sharp(inputImagePath, { animated: true, sequentialRead: true })
+      : sharp(inputImagePath, { sequentialRead: true});
 
     // 处理旋转
     if (option.rotate?.[0]) {
@@ -90,30 +92,37 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
     const width = option.width?.[0] ? Number(option.width[0]) : null;
     const height = option.height?.[0] ? Number(option.height[0]) : null;
     if (width || height) {
-      sharpObj = sharpObj.resize({ width, height });
+      var sizeOption = {}
+      if (width) {
+        sizeOption.width = width;
+      }
+      if (height) {
+        sizeOption.height = height;
+      }
+      sharpObj = sharpObj.resize(sizeOption);
     }
 
     // 设置输出格式及选项
     let formatOptions = {}; // 根据格式设置对应选项
     switch (format) {
       case 'png':
-        formatOptions = {quality: quality, palette: true, compressionLevel: 9}
+        formatOptions = {quality: quality, palette: true, compressionLevel: 9,  progressive: true}
         break;
       case 'webp':
-        formatOptions = {quality: quality}
+        formatOptions = {quality: quality,  progressive: true}
         break;
       case 'avif':
-        formatOptions = {quality: quality}
+        formatOptions = {quality: quality,  progressive: true}
         break;
       case 'jpg':
       case 'jpeg':
-        formatOptions = {quality: quality, progressive: true, mozjpeg: true}
+        formatOptions = {quality: quality, progressive: true, mozjpeg: true,  progressive: true}
         break;
       case 'tiff':
-        formatOptions = {quality: quality}
+        formatOptions = {quality: quality,  progressive: true}
         break;
       case 'gif':
-        formatOptions = {colors: Number(option.colors[0]), colours: Number(option.colours[1])}
+        formatOptions = {colors: Number(option.colors[0]), colours: Number(option.colours[1]),  progressive: true}
         break;
     }
     sharpObj = sharpObj.toFormat(format, formatOptions);
@@ -144,6 +153,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
       sharpObj.destroy();
       sharpObj = null;
     }
+    global.gc();
   }
 }
 module.exports = saveFile
