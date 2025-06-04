@@ -133,7 +133,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
 
     // 更新任务状态
     const fileSize = (await fs.promises.stat(targetImagePath)).size;
-    JSONDB.setTaskStatus(taskId, {
+    await JSONDB.setTaskStatus(taskId, {
       name: fileName,
       status: 'success',
       size: size,
