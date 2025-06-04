@@ -44,7 +44,7 @@ const JSONDB = {
   setTaskStatus: async (taskId, item) => {
     const list = await JSONDB.getTaskList(taskId);
     const index = list.findIndex(file => file.name === item.name)
-    await db.push(`/${taskId}/list[${index}]`, item);
+    await db.push(`/${taskId}/list[${index}]`, item, true);
     try {
       await db.save()
     } catch (e) {
@@ -53,6 +53,7 @@ const JSONDB = {
   },
   getTaskList: async (taskId) => {
     try {
+      await db.reload()
       return await db.getData(`/${taskId}/list`)
     } catch (e) {
       return null

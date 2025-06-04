@@ -221,14 +221,28 @@ function updateFileItemProgress(fileName, percent) {
   if (fileItem) {
     fileItem.querySelector('.file-progress-bar').style.width = `${percent}%`
     if (percent === 100) {
-      fileItem.querySelector('.file-status-text').innerText = '压缩中'
+      setTimeout(() => {
+        fileItem.querySelector('.file-status-text').innerText = '压缩中'
+      }, 500)
     }
   }
 }
 
 // 获取任务列表
 let getListTimer = null
+let uploadingFiles = []
 async function getTaskList() {
+  // 获取上传中的文件列表
+  uploadingFiles = []
+  const domList = document.querySelectorAll('#file-list .file-item')
+  if (domList && domList.length) {
+    for (let i = 0; i < domList.length; i++) {
+      if (domList[i].querySelector('.file-status-text').innerText.indexOf('上传中') !== -1 && domList[i].getAttribute('data-name')) {
+        uploadingFiles.push(domList[i].getAttribute('data-name'))
+      }
+    }
+  }
+
   const res = await fetch(`/getTaskList/?taskId=${uuid}`)
   console.log(res)
   if (res.ok) {
@@ -240,14 +254,26 @@ async function getTaskList() {
       for (let i = 0; i < list.length; i++) {
         const item = list[i];
         resMap[item.name] = item
-        if (item.status === 'waiting') {
+        let format = args.format
+        if (format === '') {
+          // 获取文件扩展名
+          format = item.name.split('.').pop()
+          // 转为小写
+          format = format.toLowerCase()
+        }
+        if (item.status === 'waiting' || item.url.indexOf(format) === -1) {
           allFinish = false
         }
       }
-      if (allFinish && list.length >= document.querySelectorAll('#file-list .file-item:not(.hidden)').length) {
-        clearInterval(getListTimer)
+      if (uploadingFiles && uploadingFiles.length) {
+        allFinish = false
       }
-      const domList = document.querySelectorAll('#file-list .file-item')
+      if (allFinish && list.length >= document.querySelectorAll('#file-list .file-item:not(.hidden)').length) {
+        // setTimeout(() => {
+          clearInterval(getListTimer)
+        // }, 4000)
+
+      }
       for (let i = 0; i < domList.length; i++) {
         const dom = domList[i];
         const fileName = dom.getAttribute('data-name')
@@ -261,7 +287,17 @@ async function getTaskList() {
   }
 }
 function updateListItem(dom, itemData) {
+  let format = args.format
+  if (format === '') {
+    // 获取文件扩展名
+    format = itemData.name.split('.').pop()
+    // 转为小写
+    format = format.toLowerCase()
+  }
   // dom.querySelector('.file-status-text').innerText = itemData.status === 'waiting' ? '压缩中' : '压缩成功'
+  if (uploadingFiles.indexOf(itemData.name) > -1 || itemData.url.indexOf(format) === -1) {
+    return
+  }
   if (itemData.status === 'success') {
     const successSvg = document.querySelector('svg.success-icon')?.cloneNode(true)
     successSvg.style.display = 'inline'
