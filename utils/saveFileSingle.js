@@ -110,7 +110,7 @@ const compressImage = async (inputImagePath, targetImagePath, option, fileName, 
               compressedSize: fileSize.size,
               url: targetImagePath.split('public')[1] + '?' + Date.now() // 防止缓存
             }
-            JSONDB.setTaskStatus(taskId, [saveInfo], index)
+            await JSONDB.setTaskStatus(taskId, [saveInfo], index)
             resolve(saveInfo)
           } catch (e) {
             console.error(e)
