@@ -304,7 +304,11 @@ function updateListItem(dom, itemData) {
     dom.querySelector('.file-status-text').innerText = ''
     dom.querySelector('.file-status-text').appendChild(successSvg)
     dom.querySelector('.compressed-size').innerText = formatBytes(itemData.compressedSize)
-    dom.querySelector('.ratio').innerText = `${Math.floor((itemData.compressedSize - itemData.size) / itemData.size * 100)}%`
+    let ratio = Math.floor((itemData.compressedSize - itemData.size) / itemData.size * 100)
+    if (ratio > 0) {
+      ratio = "+" + ratio
+    }
+    dom.querySelector('.ratio').innerText = `${ratio}%`
     dom.querySelector('.download-button').classList.remove('disable')
     dom.querySelector('.download-button').onclick = () => {
       downloadFile(itemData.url)
