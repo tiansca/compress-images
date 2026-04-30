@@ -39,6 +39,7 @@ document.querySelector('#rotate').addEventListener('input', function (e) {
 // })
 document.querySelector('#colours').addEventListener('input', function (e) {
   args.colours = e.target.value
+  args.colors = e.target.value
 })
 
 // 拖动上传
